@@ -1654,14 +1654,14 @@ body.sheet-open{overflow:hidden}
     els.forEach(function(e){io.observe(e)});
   }
 
-  /* ---------- Lookup data (demo) ---------- */
-  var CHIPS={"985141000123456":1,"900164000987654":1,"956000012345678":1,"0A0139712D":1};
+  /* ---------- Lookup: live BC Pet Registry yes/no via the bcpr-salesforce WordPress endpoint ---------- */
+  var LOOKUP_API="https://bcpr-staging.techtix.agency/wp-json/bcpr/v1/lookup";
   var YEARS={L:"2001 or 2022",M:"2002 or 2023",N:"2003 or 2024",P:"2004 or 2025",R:"2005 or 2026",S:"2006",T:"2007",V:"2008",W:"2009",X:"2010",Y:"2011",Z:"2012",A:"2013",B:"2014",C:"2015",E:"2016",F:"2017",G:"2018",H:"2019",J:"2020",K:"2021"};
   var CLINICS={AA:{n:"Vancouver Veterinary Hospital",c:"Vancouver"},AB:{n:"BC SPCA Animal Hospital",c:"Vancouver"},AAH:{n:"Yaletown Pet Hospital",c:"Vancouver"},AAK:{n:"K.L.O. Veterinary Hospital",c:"Kelowna"},CC:{n:"Cranbrook Veterinary Hospital",c:"Cranbrook"},DB:{n:"Dunbar Veterinary Hospital",c:"Vancouver",closed:1},BT:{n:"Eagle Road Animal Hospital",c:"Mission",closed:1,to:"AGJ"},AGJ:{n:"Eagle Hill Animal Hospital"},AAA:{n:"Vetcetera Pet Hospital – Park Royal",closed:1,to:"ACT"},ACT:{n:"West Vancouver Veterinary Hospital"}};
   var GUIDE='https://bcpetregistry.ca/wp-content/uploads/2024/01/BC-Pet-Registry-Tattoo-Code-Guide-2026-V8.pdf';
   var CALL='<a class="btn sm b-red" href="tel:18556227722">'+ICON("ic-phone")+'Call 1-855-622-7722</a>';
   var MODES={
-    chip:{label:"Your pet's microchip number",ph:"985 141 000 123 456",hint:'Demo: try <button type="button" class="lnk" data-fill="985141000123456">985 141 000 123 456</button> (registered) or <button type="button" class="lnk" data-fill="981020000111222">981 020 000 111 222</button> (not found). Owner details are never shown.'},
+    chip:{label:"Your pet's microchip number",ph:"985 141 000 123 456",hint:'Checks BC Pet Registry records live. Owner details are never shown.'},
     tattoo:{label:"Ear tattoo (e.g. 123AAHV)",ph:"123AAHV",hint:'Try <button type="button" class="lnk" data-fill="123AAHV">123AAHV</button>, <button type="button" class="lnk" data-fill="45BTK">45BTK</button> or <button type="button" class="lnk" data-fill="7ABR">7ABR</button>. Animal number, then clinic letters, then the year letter.'}
   };
   function fmtChip(s){return /^\d{15}$/.test(s)?s.replace(/(\d{3})(\d{3})(\d{3})(\d{3})(\d{3})/,"$1 $2 $3 $4 $5"):s;}
@@ -1672,20 +1672,29 @@ body.sheet-open{overflow:hidden}
       res.className="res err";res.innerHTML='<h4>'+ICON("ic-x")+'Check the number</h4><p>Microchip numbers are 9, 10 or 15 characters. You entered '+s.length+'.</p><p class="fn">Some older 10-character chips include the letters A–F. No scanner? Any vet or BC SPCA location will scan a pet for free.</p>';res.hidden=false;return;
     }
     res.className="res wait";res.innerHTML='<h4>Checking '+fmtChip(s)+'…</h4><div class="shim"></div><div class="shim" style="width:58%"></div>';res.hidden=false;
-    var fn='<p class="fn">List updated Oct 1, 2026. Registered in the last few weeks? Call us to confirm. Owner details are never shown.</p>';
-    res._t=setTimeout(function(){
-      if(CHIPS[s]){
+    var fn='<p class="fn">Checked live against BC Pet Registry records. Owner details are never shown.</p>';
+    var seq=res._seq=(res._seq||0)+1;
+    fetch(LOOKUP_API+'?chip='+encodeURIComponent(s),{headers:{'Accept':'application/json'}}).then(function(r){
+      return r.json().then(function(j){return{st:r.status,j:j};});
+    }).then(function(o){
+      if(seq!==res._seq)return;
+      if(o.st!==200||typeof o.j.registered!=='boolean'){showFail(o.st);return;}
+      if(o.j.registered){
         var mine='<div class="path"><b>This is my pet</b><p>Good. Now the part that matters: is the phone number we have for you current?</p><a class="btn sm b-teal" href="#manage">Sign in &amp; check my details</a></div>';
         var found='<div class="path"><b>I found this pet</b><p>Leave your email or phone and we\'ll notify the owner right away, or call us. After 6pm, a vet or animal control office can reach us for you.</p><button type="button" class="btn sm b-teal" data-ff-open="reg">'+ICON("ic-mail")+'Notify the owner</button><a class="lnk small" href="tel:18556227722">or call 1-855-622-7722</a></div>';
         res.className="res ok";
         res.innerHTML='<h4>'+ICON("ic-checkc")+'Yes. This microchip is registered with BC Pet Registry.</h4><p><span class="code">'+fmtChip(s)+'</span></p><div class="paths">'+(ctx==="finder"?found+mine:mine+found)+'</div><div data-ff-slot>'+(ctx==="finder"?ffHTML("reg"):'')+'</div>'+fn;
       }else{
-        var mine2='<div class="path hot"><b>This is my pet</b><p>Register it now so a BC shelter, vet or animal control officer can reach you.</p><a class="btn sm b-red" href="#owners">Register now</a><a class="lnk small" href="#fee">Do I pay anything?</a></div>';
-        var found2='<div class="path"><b>I found this pet</b><p>Call us with this number and we\'ll help you reach the owner. After 6pm, any vet or animal control office can reach us for you.</p>'+CALL+'<a class="lnk small" href="#lost">Lost &amp; found help</a></div>';
+        var mine2='<div class="path hot"><b>This is my pet</b><p>Register it now. A registered chip means the moment someone finds your pet and searches the number here, we email you their contact details, so pets get home faster.</p><a class="btn sm b-red" href="#owners">Register now</a><a class="lnk small" href="#fee">Do I pay anything?</a></div>';
+        var found2='<div class="path"><b>I found this pet</b><p>Take the pet to a vet clinic or BC SPCA location: they scan for free and can trace the chip. Or call us with this number and we\'ll help.</p>'+CALL+'<a class="lnk small" href="#lost">Lost &amp; found help</a></div>';
         res.className="res no";
         res.innerHTML='<h4>'+ICON("ic-search")+'Not registered with BC Pet Registry yet.</h4><p><span class="code">'+fmtChip(s)+'</span></p><div class="paths">'+(ctx==="finder"?found2+mine2:mine2+found2)+'</div><div data-ff-slot></div>'+fn;
       }
-    },700);
+    }).catch(function(){if(seq===res._seq)showFail(0);});
+    function showFail(st){
+      res.className="res err";
+      res.innerHTML='<h4>'+ICON("ic-x")+(st===429?'Too many checks in a row':'We couldn\'t check that right now')+'</h4><p>'+(st===429?'Please wait a few minutes and try again.':'Please try again in a moment.')+' Need help now? Our team answers 9am–6pm daily.</p>'+CALL;
+    }
   }
   function parseTattoo(raw){
     var s=raw.replace(/[\s-]/g,"").toUpperCase();
