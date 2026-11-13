@@ -743,6 +743,7 @@ body.sheet-open{overflow:hidden}
 .ff label small{font-weight:400;color:var(--muted)}
 .lk .ff input:not([type=checkbox]),.ff input:not([type=checkbox]){font:500 1rem var(--f-body);letter-spacing:0;padding:11px 12px;border:2px solid var(--line);border-radius:var(--r);min-width:0;width:100%;background:#fff;color:var(--ink)}
 .lk .ff input:focus,.ff input:focus{border-color:var(--blue-green);outline-offset:2px}
+.ff .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0;overflow:hidden}
 .ffrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:10px}
 .ff .ffc{display:flex;gap:10px;align-items:flex-start;font:400 .9rem var(--f-body);color:var(--ink-2)}
 .lk .ff .ffc input,.ff .ffc input{width:18px;height:18px;margin-top:2px;flex:none;accent-color:var(--deep-blue-green)}
@@ -1656,6 +1657,7 @@ body.sheet-open{overflow:hidden}
 
   /* ---------- Lookup: live BC Pet Registry yes/no via the bcpr-salesforce WordPress endpoint ---------- */
   var LOOKUP_API="https://bcpr-staging.techtix.agency/wp-json/bcpr/v1/lookup";
+  var REPORT_API="https://bcpr-staging.techtix.agency/wp-json/bcpr/v1/report";
   var YEARS={L:"2001 or 2022",M:"2002 or 2023",N:"2003 or 2024",P:"2004 or 2025",R:"2005 or 2026",S:"2006",T:"2007",V:"2008",W:"2009",X:"2010",Y:"2011",Z:"2012",A:"2013",B:"2014",C:"2015",E:"2016",F:"2017",G:"2018",H:"2019",J:"2020",K:"2021"};
   var CLINICS={AA:{n:"Vancouver Veterinary Hospital",c:"Vancouver"},AB:{n:"BC SPCA Animal Hospital",c:"Vancouver"},AAH:{n:"Yaletown Pet Hospital",c:"Vancouver"},AAK:{n:"K.L.O. Veterinary Hospital",c:"Kelowna"},CC:{n:"Cranbrook Veterinary Hospital",c:"Cranbrook"},DB:{n:"Dunbar Veterinary Hospital",c:"Vancouver",closed:1},BT:{n:"Eagle Road Animal Hospital",c:"Mission",closed:1,to:"AGJ"},AGJ:{n:"Eagle Hill Animal Hospital"},AAA:{n:"Vetcetera Pet Hospital – Park Royal",closed:1,to:"ACT"},ACT:{n:"West Vancouver Veterinary Hospital"}};
   var GUIDE='https://bcpetregistry.ca/wp-content/uploads/2024/01/BC-Pet-Registry-Tattoo-Code-Guide-2026-V8.pdf';
@@ -1682,7 +1684,7 @@ body.sheet-open{overflow:hidden}
       if(o.j.registered){
         var mine='<div class="path"><b>This is my pet</b><p>Good. Now the part that matters: is the phone number we have for you current?</p><a class="btn sm b-teal" href="#manage">Sign in &amp; check my details</a></div>';
         var found='<div class="path"><b>I found this pet</b><p>Leave your email or phone and we\'ll notify the owner right away, or call us. After 6pm, a vet or animal control office can reach us for you.</p><button type="button" class="btn sm b-teal" data-ff-open="reg">'+ICON("ic-mail")+'Notify the owner</button><a class="lnk small" href="tel:18556227722">or call 1-855-622-7722</a></div>';
-        res.className="res ok";
+        res.className="res ok";res.dataset.chip=s;
         res.innerHTML='<h4>'+ICON("ic-checkc")+'Yes. This microchip is registered with BC Pet Registry.</h4><p><span class="code">'+fmtChip(s)+'</span></p><div class="paths">'+(ctx==="finder"?found+mine:mine+found)+'</div><div data-ff-slot>'+(ctx==="finder"?ffHTML("reg"):'')+'</div>'+fn;
       }else{
         var mine2='<div class="path hot"><b>This is my pet</b><p>Register it now. A registered chip means the moment someone finds your pet and searches the number here, we email you their contact details, so pets get home faster.</p><a class="btn sm b-red" href="#owners">Register now</a><a class="lnk small" href="#fee">Do I pay anything?</a></div>';
@@ -1742,7 +1744,7 @@ body.sheet-open{overflow:hidden}
     reg:{lead:"Leave your email or phone and we\u2019ll notify the owner and our team right away. The owner sees only what you enter here, and you never see their details.",btn:"Send to the owner",done:"The owner has been notified with your contact details and our team has a copy. If you left an email, a confirmation is on its way to you. Nothing back within the hour? Call 1-855-622-7722."},
     tattoo:{lead:"Leave your email or phone and our team will contact the clinic that holds this tattoo\u2019s owner record.",btn:"Send to our team",done:"Our team will contact the clinic and get back to you. Urgent? Call 1-855-622-7722."}
   };
-  function ffHTML(k){var c=FF[k];return '<form class="ff" novalidate data-ff="'+k+'"><p>'+c.lead+'</p><div class="ffrow"><label>Your email<input type="email" name="email" autocomplete="email" placeholder="you@example.com"></label><label>Your phone<input type="tel" name="phone" autocomplete="tel" placeholder="604 555 0199"></label></div><label>Where and when you found the pet <small>(optional)</small><input type="text" name="note" placeholder="Near Trout Lake, this morning"></label><label class="ffc"><input type="checkbox" name="ok"> You may share these details with the pet\u2019s owner and the BC Pet Registry team.</label><div class="ffbtns"><button class="btn sm b-teal" type="submit">'+ICON("ic-mail")+c.btn+'</button><span class="err" role="alert" hidden></span></div></form>';}
+  function ffHTML(k){var c=FF[k];return '<form class="ff" novalidate data-ff="'+k+'"><p>'+c.lead+'</p>'+(k==="reg"?'<label>Your name <small>(optional)</small><input type="text" name="name" autocomplete="name" maxlength="80"></label><input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">':'')+'<div class="ffrow"><label>Your email<input type="email" name="email" autocomplete="email" placeholder="you@example.com"></label><label>Your phone<input type="tel" name="phone" autocomplete="tel" placeholder="604 555 0199"></label></div><label>Where and when you found the pet <small>(optional)</small><input type="text" name="note" placeholder="Near Trout Lake, this morning"></label><label class="ffc"><input type="checkbox" name="ok"> You may share these details with the pet\u2019s owner and the BC Pet Registry team.</label><div class="ffbtns"><button class="btn sm b-teal" type="submit">'+ICON("ic-mail")+c.btn+'</button><span class="err" role="alert" hidden></span></div></form>';}
   document.addEventListener("click",function(e){
     var b=e.target.closest("[data-ff-open]");if(!b)return;
     var res=b.closest(".res"),slot=res&&res.querySelector("[data-ff-slot]");if(!slot)return;
@@ -1755,6 +1757,20 @@ body.sheet-open{overflow:hidden}
     var okEmail=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email),okPhone=phone.length>=7;
     if(!okEmail&&!okPhone){err.textContent=(email||phone)?"Please check the email or phone number.":"Please enter an email or a phone number.";err.hidden=false;return;}
     if(!f.elements.ok.checked){err.textContent="Please tick the box so we can pass your details on.";err.hidden=false;return;}
+    if(f.dataset.ff==="reg"){
+      var chip=(f.closest(".res")||{dataset:{}}).dataset.chip,btn=f.querySelector("button[type=submit]");
+      if(btn.disabled)return;btn.disabled=true;err.hidden=true;
+      var done=function(msg,ok){f.outerHTML='<div class="ffdone" role="status"><b>'+ICON(ok?"ic-checkc":"ic-x")+(ok?'Sent.':'Not sent.')+'</b><p>'+msg+'</p></div>';};
+      var oops="We couldn\u2019t send that just now. Please call us at 1-855-622-7722, 9am\u20136pm daily.";
+      fetch(REPORT_API,{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({chip:chip,name:f.elements.name.value,email:email,phone:f.elements.phone.value,message:f.elements.note.value,consent:true,website:f.elements.website.value})}).then(function(r){
+        return r.json().catch(function(){return{};}).then(function(j){return{st:r.status,j:j};});
+      }).then(function(o){
+        if(o.st===200&&o.j.ok===true)done(o.j.owner_emailed===true?"Microchip found. We\u2019ve emailed the owner your contact details.":"Microchip found. Our team will contact the owner and follow up with you.",true);
+        else if(o.st===429)done("Too many reports from this connection. Please wait a little and try again, or call 1-855-622-7722.",false);
+        else done(oops,false);
+      }).catch(function(){done(oops,false);});
+      return;
+    }
     f.outerHTML='<div class="ffdone" role="status"><b>'+ICON("ic-checkc")+'Sent.</b><p>'+c.done+'</p><p class="small muted">Demo: nothing was sent.</p></div>';
   });
   $$(".qhelp").forEach(function(b){var pop=document.getElementById(b.getAttribute("aria-controls"));if(!pop)return;b.addEventListener("click",function(){var open=pop.hidden;pop.hidden=!open;b.setAttribute("aria-expanded",open?"true":"false");});});
