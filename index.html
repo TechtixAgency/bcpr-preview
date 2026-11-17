@@ -1686,7 +1686,15 @@ body.sheet-open{overflow:hidden}
       if(seq!==res._seq)return;
       if(o.st!==200||typeof o.j.registered!=='boolean'){showFail(o.st);return;}
       if(o.j.registered){
-        var mine='<div class="path"><b>This is my pet</b><p>Good. Now the part that matters: is the phone number we have for you current?</p><a class="btn sm b-teal" href="#manage">Sign in &amp; check my details</a><p class="small">Did your vet, a shelter or the BC SPCA register it? You already have an account under the email you gave them. Use <b>Forgot password</b> with that email to set your password. Please don\'t register again.</p><a class="lnk small" href="#vetreg">How to get into your account</a></div>';
+        var FP='You already have an account under the email you gave them. Use <b>Forgot password</b> with that email to set your password. Please don\'t register again.</p><a class="lnk small" href="#vetreg">How to get into your account</a>';
+        var MINE_HELP={
+          vet:'<p class="small"><b>Your vet registered this pet.</b> '+FP,
+          shelter:'<p class="small"><b>A shelter or the BC SPCA registered this pet.</b> '+FP,
+          owner:'<p class="small">Sign in with the email you used when you registered. Forgot it? Use <b>Forgot password</b>.</p>',
+          generic:'<p class="small">Did your vet, a shelter or the BC SPCA register it? You already have an account under the email you gave them. Use <b>Forgot password</b> with that email to set your password. Please don\'t register again.</p><a class="lnk small" href="#vetreg">How to get into your account</a>'
+        };
+        var via=Object.prototype.hasOwnProperty.call(MINE_HELP,o.j.via)?o.j.via:"generic";
+        var mine='<div class="path"><b>This is my pet</b><p>Good. Now the part that matters: is the phone number we have for you current?</p><a class="btn sm b-teal" href="#manage">Sign in &amp; check my details</a>'+MINE_HELP[via]+'</div>';
         var found='<div class="path"><b>I found this pet</b><p>Leave your email or phone and we\'ll notify the owner right away, or call us. After 6pm, a vet or animal control office can reach us for you.</p><button type="button" class="btn sm b-teal" data-ff-open="reg">'+ICON("ic-mail")+'Notify the owner</button><a class="lnk small" href="tel:18556227722">or call 1-855-622-7722</a></div>';
         res.className="res ok";res.dataset.chip=s;
         res.innerHTML='<h4>'+ICON("ic-checkc")+'Yes. This microchip is registered with BC Pet Registry.</h4><p><span class="code">'+fmtChip(s)+'</span></p><div class="paths">'+(ctx==="finder"?found+mine:mine+found)+'</div><div data-ff-slot>'+(ctx==="finder"?ffHTML("reg"):'')+'</div>'+fn;
