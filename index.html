@@ -1131,7 +1131,7 @@ body.sheet-open{overflow:hidden}
     <div class="stack">
       <span class="crumbs"><a href="#home">Home</a> / Manage my pet</span>
       <h1>Welcome back.</h1>
-      <p class="lede">Sign in to update your details, transfer a pet, add one, or report a pet lost. If you adopted from the BC SPCA, your pet is already registered: activate your account instead of registering again.</p>
+      <p class="lede">Sign in to update your details, transfer a pet, add one, or report a pet lost. Registered by your vet, a shelter or the BC SPCA? You already have an account: set your password instead of registering again.</p>
       <p class="small muted">Can't find your welcome email? Call 1-855-622-7722 and we'll look you up.</p>
     </div>
     <form class="signin" onsubmit="event.preventDefault()">
@@ -1139,7 +1139,7 @@ body.sheet-open{overflow:hidden}
       <div class="stack" style="gap:6px"><label for="em">Email</label><input id="em" type="email" autocomplete="username" placeholder="you@example.com"></div>
       <div class="stack" style="gap:6px"><label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password" placeholder="••••••••"></div>
       <button class="btn b-teal" type="submit">Sign in to my account</button>
-      <div class="meta"><a href="#manage">Forgot password</a><a href="#manage">BC SPCA adopter? Activate your account</a></div>
+      <div class="meta"><a href="#manage">Forgot password</a><a href="#vetreg">Registered by a vet or the BC SPCA? Set your password</a></div>
       <p class="fn">Opens the secure BC Pet Registry account portal (Salesforce).</p>
     </form>
   </div></div>
@@ -1155,7 +1155,9 @@ body.sheet-open{overflow:hidden}
     </div>
   </div></div>
   <div class="sec cloud tight" data-el><span class="el">Section · Notice</span><div class="wrap stack" style="max-width:900px">
-    <div class="notice rv"><b>Adopted from the BC SPCA?</b><p>Your pet was registered on adoption day and the chip is already linked to you. Don't register again: activate your account using the email you gave the shelter.</p></div>
+    <div class="notice rv" id="vetreg"><b>Your vet, a shelter or the BC SPCA registered your pet?</b><p>Then you already have an account, under the email you gave them. You just haven't set a password yet.</p>
+      <ol class="small" style="margin:.4rem 0 .4rem 1.1rem;padding:0"><li>On the sign-in page, choose <b>Forgot password</b>.</li><li>Enter the email you gave your vet or the shelter.</li><li>Open the email from BC Pet Registry (check spam) and set your password.</li><li>Sign in and check your phone number and address. That's what brings a pet home.</li></ol>
+      <p class="small">Signing up again with the same email won't work: it tells you the email is already registered. Not sure which email they used, or no longer have it? Call <a href="tel:18556227722">1-855-622-7722</a> and we'll update it for you.</p></div>
   </div></div>
 </section>
 
@@ -1373,7 +1375,9 @@ body.sheet-open{overflow:hidden}
       <details data-t="fees owners"><summary>Who pays the $45 registration fee?</summary><div><p>Only owners registering a chip that didn't come from BC Pet Registry. Chips your vet, shelter or the BC SPCA buys from us include lifetime registration, so most people pay nothing.</p></div></details>
       <details data-t="fees owners"><summary>How much does it cost to microchip a dog or cat in BC?</summary><div><p>Typically $25–$120, depending on the clinic. Registration is included with a BC Pet Registry chip; otherwise $45 for life. <a href="#cost">Full cost guide</a>. Our community microchip clinics are free, including registration.</p></div></details>
       <details data-t="fees vets"><summary>Does my clinic pay a fee to register chips?</summary><div><p>Not for BC Pet Registry chips. Registration is built into the chip, so there is nothing to pay for your clinic or your client. If a client brings a chip from another supplier, the owner registers it themselves for a one-time $45.</p></div></details>
-      <details data-t="adopters"><summary>I adopted from the BC SPCA. Do I need to register?</summary><div><p>No. Your pet was registered on adoption day. Activate your account with the email you gave the shelter, then check your details.</p></div></details>
+      <details data-t="adopters"><summary>I adopted from the BC SPCA. Do I need to register?</summary><div><p>No. Your pet was registered on adoption day. Use Forgot password with the email you gave the shelter to set your password, then check your details.</p></div></details>
+      <details data-t="owners"><summary>My vet registered my pet. How do I get into my account?</summary><div><p>Your vet created the account with the email you gave them. On the sign-in page choose Forgot password, enter that email, and set a password from the email we send. If you no longer have that email, call us and we'll update it.</p></div></details>
+      <details data-t="owners"><summary>It says my email is already registered. What now?</summary><div><p>That means you already have an account, usually set up by your vet, a shelter or the BC SPCA. Don't sign up again: use Forgot password with the same email to set your password.</p></div></details>
       <details data-t="owners"><summary>Is a city licence the same as registering with BC Pet Registry?</summary><div><p>No. A licence is a municipal requirement you buy from your city each year. BC Pet Registry is the provincial pet ID database behind your pet's microchip or tattoo. Many pets need both.</p></div></details>
       <details data-t="owners"><summary>Which animals can be registered?</summary><div><p>Dogs, cats, rabbits, ferrets, birds and horses. <span class="muted">(Final list to be confirmed.)</span></p></div></details>
       <details data-t="owners"><summary>How do I transfer ownership?</summary><div><p>Sign in and use the transfer tool. Transfers are free. Shelters transfer at adoption automatically.</p></div></details>
@@ -1635,7 +1639,7 @@ body.sheet-open{overflow:hidden}
     $$("#tabs a").forEach(function(a){a.toggleAttribute("aria-current",false);if(a.dataset.p===target)a.setAttribute("aria-current","page");});
     $$(".hdr nav a").forEach(function(a){a.classList.toggle("on",a.dataset.nav===target);});
     sel.value=target;closeMenu();
-    if(valid)window.scrollTo(0,0);else{var e=document.getElementById(h);if(e){var y=e.getBoundingClientRect().top+window.scrollY-90;window.scrollTo(0,y);}}
+    if(valid)window.scrollTo(0,0);else{var e=document.getElementById(h);if(e){var to=function(){window.scrollTo(0,e.getBoundingClientRect().top+window.scrollY-90);};to();setTimeout(to,400);}} // re-aim once reveal animations settle
     reveal();window.dispatchEvent(new Event("scroll"));
   }
   window.addEventListener("hashchange",show);
@@ -1682,7 +1686,7 @@ body.sheet-open{overflow:hidden}
       if(seq!==res._seq)return;
       if(o.st!==200||typeof o.j.registered!=='boolean'){showFail(o.st);return;}
       if(o.j.registered){
-        var mine='<div class="path"><b>This is my pet</b><p>Good. Now the part that matters: is the phone number we have for you current?</p><a class="btn sm b-teal" href="#manage">Sign in &amp; check my details</a></div>';
+        var mine='<div class="path"><b>This is my pet</b><p>Good. Now the part that matters: is the phone number we have for you current?</p><a class="btn sm b-teal" href="#manage">Sign in &amp; check my details</a><p class="small">Did your vet, a shelter or the BC SPCA register it? You already have an account under the email you gave them. Use <b>Forgot password</b> with that email to set your password. Please don\'t register again.</p><a class="lnk small" href="#vetreg">How to get into your account</a></div>';
         var found='<div class="path"><b>I found this pet</b><p>Leave your email or phone and we\'ll notify the owner right away, or call us. After 6pm, a vet or animal control office can reach us for you.</p><button type="button" class="btn sm b-teal" data-ff-open="reg">'+ICON("ic-mail")+'Notify the owner</button><a class="lnk small" href="tel:18556227722">or call 1-855-622-7722</a></div>';
         res.className="res ok";res.dataset.chip=s;
         res.innerHTML='<h4>'+ICON("ic-checkc")+'Yes. This microchip is registered with BC Pet Registry.</h4><p><span class="code">'+fmtChip(s)+'</span></p><div class="paths">'+(ctx==="finder"?found+mine:mine+found)+'</div><div data-ff-slot>'+(ctx==="finder"?ffHTML("reg"):'')+'</div>'+fn;
@@ -1822,7 +1826,7 @@ body.sheet-open{overflow:hidden}
   /* ---------- Who are you (selector → panel) ---------- */
   var WHO={
     owner:{c:"var(--hummingbird)",tag:"Pet owner",h:"My pet's chip isn't registered yet, or I'm not sure.",facts:["Check the chip number first. It takes ten seconds, and the answer surprises a lot of people.","A BC Pet Registry chip, the kind participating vets, shelters and the BC SPCA buy from us, already includes lifetime registration.","A chip from anywhere else can be registered for a one-time $45. Transfers and updates are always free."],costl:"Good to know",cost:"Already covered with a registry chip",btn:'<a class="btn b-red" href="#home" data-focus-lk>Check if it\'s registered</a><a class="btn b-ghost" href="#owners">Register now</a>',more:["Taking a dog to the US? Read this first","#travel"]},
-    registered:{c:"var(--blue-green)",ct:"var(--deep-blue-green)",tag:"BC SPCA associated adopter",h:"My pet came through the BC SPCA or a partner clinic.",facts:["Pets from BC SPCA shelters, BC SPCA adoptions and BC Pet Registry partner clinics are registered at the source. You're already in the registry.","Please don't register again. Sign in to check your phone number and address. That's what brings a pet home.","Adopted recently? Activate your account with the email you gave the shelter or clinic."],costl:"Good to know",cost:"Already registered. Updates are free.",btn:'<a class="btn b-teal" href="#manage">Sign in</a><a class="btn b-ghost" href="#home" data-focus-lk>Check my pet\'s chip</a>',more:["I can't find my login","#manage"]},
+    registered:{c:"var(--blue-green)",ct:"var(--deep-blue-green)",tag:"BC SPCA associated adopter",h:"My pet came through the BC SPCA or a partner clinic.",facts:["Pets from BC SPCA shelters, BC SPCA adoptions and BC Pet Registry partner clinics are registered at the source. You're already in the registry.","Please don't register again. Sign in to check your phone number and address. That's what brings a pet home.","Never set a password? Use Forgot password with the email you gave the shelter or clinic."],costl:"Good to know",cost:"Already registered. Updates are free.",btn:'<a class="btn b-teal" href="#manage">Sign in</a><a class="btn b-ghost" href="#home" data-focus-lk>Check my pet\'s chip</a>',more:["I can't find my login","#manage"]},
     vet:{c:"var(--spca-blue)",tag:"Vet or clinic",h:"I implant or order microchips.",facts:["Every BC Pet Registry chip includes lifetime registration, so clients who get one from you are covered.","Non-profit: chip revenue funds the seven-day lost-pet line and free community microchip clinics, not shareholders.","Host a microchip clinic and we bring the chips and the crowd: new clients for you, every pet registered."],costl:"Good to know",cost:"Our chips include registration",btn:'<a class="btn b-blue" href="#vets">Why clinics use our microchip</a><a class="btn b-ghost" href="https://bc-pet-registry.myshopify.com/" target="_blank" rel="noopener">Order microchips</a>',more:["Host a microchip clinic","#vets-clinic"]},
     shelter:{c:"var(--berry)",tag:"Shelter or rescue",h:"I register animals in bulk.",facts:["Industry accounts register and transfer animals in bulk.","Transfers to adopters at adoption are free.","Non-profit chip pricing, plus community grants funded by the registry."],costl:"Good to know",cost:"Non-profit chip pricing",btn:'<a class="btn b-berry" href="#shelters">For shelters &amp; rescues</a>',more:["Community microchip grants","#shelters"]},
     lost:{c:"var(--deep-red)",tag:"Lost or found",h:"I lost a pet, or I found one.",facts:["Search the chip or tattoo number first. Finders are never asked to register anything.","Call 1-855-622-7722, 9am–6pm every day. After 6pm, any vet or animal control office can reach us.","No chip number? Any vet or BC SPCA location will scan a pet for free."],costl:"Good to know",cost:"Free. Finders never register anything.",btn:'<a class="btn b-red" href="#lost">Lost &amp; found help</a><a class="btn b-ghost" href="tel:18556227722">Call 1-855-622-7722</a>'}
